@@ -1,0 +1,64 @@
+classDiagram
+    direction TB
+
+    class IConta {
+        <<interface>>
+        +sacar(valor: BigDecimal) void
+        +depositar(valor: BigDecimal) void
+        +transferir(valor: BigDecimal, destino: IConta) void
+        +imprimirExtrato() void
+    }
+
+    class Conta {
+        <<abstract>>
+        #agencia: int
+        #numero: int
+        #cliente: Cliente
+        -saldo: BigDecimal
+        -transacoes: List~Transacao~
+        +disponivelParaSaque() BigDecimal
+        #tipo()* String
+        #debitar(valor, tipo, descricao) void
+        #creditar(valor, tipo, descricao) void
+    }
+
+    class ContaCorrente {
+        -limite: BigDecimal
+        +disponivelParaSaque() BigDecimal
+        +cobrarTarifaMensal() boolean
+    }
+
+    class ContaPoupanca {
+        -rendimentoAcumulado: BigDecimal
+        +renderMes() BigDecimal
+    }
+
+    class Cliente {
+        -nome: String
+        -cpf: String
+        +getCpfMascarado() String
+    }
+
+    class Transacao {
+        <<record>>
+        dataHora: LocalDateTime
+        tipo: Tipo
+        valor: BigDecimal
+        saldoApos: BigDecimal
+    }
+
+    class Banco {
+        -nome: String
+        -contas: List~Conta~
+        +abrirContaCorrente(cliente: Cliente) ContaCorrente
+        +abrirContaPoupanca(cliente: Cliente) ContaPoupanca
+        +listarClientes() List~Cliente~
+        +totalEmDepositos() BigDecimal
+    }
+
+    IConta <|.. Conta
+    Conta <|-- ContaCorrente
+    Conta <|-- ContaPoupanca
+    Conta --> Cliente : titular
+    Conta *-- Transacao : extrato
+    Banco o-- Conta
